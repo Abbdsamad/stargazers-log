@@ -1,5 +1,9 @@
 const repositoryList = document.querySelector("#repository-list");
 const listStatus = document.querySelector("#list-status");
+const repositorySearch = document.querySelector("#repository-search");
+const languageFilter = document.querySelector("#language-filter");
+const repositorySort = document.querySelector("#repository-sort");
+let repositories = [];
 
 function createRepositoryCard(repository) {
   const item = document.createElement("li");
@@ -42,6 +46,53 @@ function createRepositoryCard(repository) {
   return item;
 }
 
+function renderRepositories() {
+  const searchTerm = repositorySearch.value.trim().toLowerCase();
+  const selectedLanguage = languageFilter.value;
+  const sortOrder = repositorySort.value;
+  const filteredRepositories = repositories
+    .filter((repository) => {
+      const searchableText = [
+        repository.name,
+        repository.description,
+        repository.language,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      return (
+        searchableText.includes(searchTerm) &&
+        (!selectedLanguage || repository.language === selectedLanguage)
+      );
+    })
+    .sort((first, second) => {
+      if (sortOrder === "name") {
+        return first.name.localeCompare(second.name);
+      }
+
+      const firstDate = Date.parse(`${first.starredAt || ""}T00:00:00Z`) || 0;
+      const secondDate = Date.parse(`${second.starredAt || ""}T00:00:00Z`) || 0;
+      return sortOrder === "oldest"
+        ? firstDate - secondDate
+        : secondDate - firstDate;
+    });
+
+  repositoryList.replaceChildren(...filteredRepositories.map(createRepositoryCard));
+
+  if (filteredRepositories.length === 0) {
+    listStatus.textContent = "No repositories match your search and filters.";
+    return;
+  }
+
+  const count = filteredRepositories.length;
+  const total = repositories.length;
+  listStatus.textContent =
+    count === total
+      ? `${count} starred ${count === 1 ? "repository" : "repositories"}`
+      : `Showing ${count} of ${total} starred repositories`;
+}
+
 async function loadRepositories() {
   try {
     const response = await fetch("./events.json");
@@ -49,7 +100,7 @@ async function loadRepositories() {
       throw new Error(`Could not load repositories (${response.status}).`);
     }
 
-    const repositories = await response.json();
+    repositories = await response.json();
     if (!Array.isArray(repositories)) {
       throw new Error("Repository data must be a list.");
     }
@@ -59,14 +110,30 @@ async function loadRepositories() {
       return;
     }
 
-    repositoryList.replaceChildren(...repositories.map(createRepositoryCard));
-    listStatus.textContent = `${repositories.length} starred ${
-      repositories.length === 1 ? "repository" : "repositories"
-    }`;
+    const languages = [
+      ...new Set(repositories.map(({ language }) => language).filter(Boolean)),
+    ].sort((first, second) => first.localeCompare(second));
+    languageFilter.append(
+      ...languages.map((language) => {
+        const option = document.createElement("option");
+        option.value = language;
+        option.textContent = language;
+        return option;
+      }),
+    );
+
+    repositorySearch.disabled = false;
+    languageFilter.disabled = false;
+    repositorySort.disabled = false;
+    renderRepositories();
   } catch (error) {
     console.error("Unable to load starred repositories:", error);
     listStatus.textContent = "Repositories couldn't be loaded. Please try again later.";
   }
 }
+
+repositorySearch.addEventListener("input", renderRepositories);
+languageFilter.addEventListener("change", renderRepositories);
+repositorySort.addEventListener("change", renderRepositories);
 
 loadRepositories();

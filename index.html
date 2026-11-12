@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="A log of the repositories I've starred.">
+    <meta name="theme-color" content="#f5f7fb">
     <title>Starred repositories | Stargazers log</title>
     <link rel="stylesheet" href="style.css">
     <script src="script.js" defer></script>
@@ -11,11 +12,37 @@
   <body>
     <main class="page">
       <header class="page-header">
-        <p class="eyebrow">My GitHub activity day 2</p>
+        <p class="eyebrow">My GitHub activity</p>
         <h1>Starred repositories</h1>
         <p class="intro">A log of the repositories I've starred.</p>
       </header>
-      <section aria-label="Starred repositories">
+      <section aria-labelledby="repositories-heading">
+        <h2 id="repositories-heading">Your collection</h2>
+        <div class="repository-controls">
+          <label>
+            Search repositories
+            <input
+              id="repository-search"
+              type="search"
+              placeholder="Name, description, or language"
+              disabled
+            >
+          </label>
+          <label>
+            Filter by language
+            <select id="language-filter" disabled>
+              <option value="">All languages</option>
+            </select>
+          </label>
+          <label>
+            Sort by
+            <select id="repository-sort" disabled>
+              <option value="recent">Recently starred</option>
+              <option value="oldest">Oldest starred</option>
+              <option value="name">Name</option>
+            </select>
+          </label>
+        </div>
         <p id="list-status" class="list-status" role="status" aria-live="polite">
           Loading repositories...
         </p>

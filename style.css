@@ -53,6 +53,44 @@ h1 {
   color: #52617a;
 }
 
+.repository-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) repeat(2, minmax(0, 1fr));
+  gap: 0.875rem;
+  margin: 1rem 0;
+}
+
+.repository-controls label {
+  display: grid;
+  gap: 0.4rem;
+  color: #52617a;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.repository-controls input,
+.repository-controls select {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid #cbd4e1;
+  border-radius: 0.5rem;
+  background: #fff;
+  color: #172033;
+  font: inherit;
+}
+
+.repository-controls input:focus-visible,
+.repository-controls select:focus-visible {
+  outline: 3px solid #9bbcf0;
+  outline-offset: 2px;
+}
+
+.repository-controls :disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 .repository-list {
   display: grid;
   gap: 0.875rem;
@@ -120,6 +158,10 @@ h1 {
 @media (max-width: 480px) {
   .page {
     padding: 2.5rem 0;
+  }
+
+  .repository-controls {
+    grid-template-columns: 1fr;
   }
 
   .repository-card {
